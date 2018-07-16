@@ -1,0 +1,114 @@
+<form>
+	ストリートカウント登録
+	<table style="white-space: nowrap; font-size: small;">
+			<tr><th>項目名</th><th colspan="3">入力欄</th></tr>
+			<tr>
+				<td>エリア：</td>
+				<td><select id="area">
+					<option value="A">A</option>
+					<option value="B">B</option>
+					<option value="C">C</option>
+					<option value="D">D</option>
+					<option value="E">E</option>
+				</select></td>
+				<td>種別：</td>
+				<td><select id="class" onchange='ClassChange()'>
+					<option value="野宿者" selected>野宿者</option>
+					<option value="施設">施設</option>
+				</select></td>
+			</tr>
+			<tr id="class1">
+				<td>性別：</td>
+				<td><select id="sex">
+					<option value="男性" selected>男性</option>
+					<option value="女性">女性</option>
+					<option value="その他">その他</option>
+					<option value="不明">不明</option>
+				</select></td>
+				<td>分類：</td>
+				<td><select id="category1">
+					<option value="駅" selected>駅</option>
+					<option value="河川">公園</option>
+					<option value="公共施設">公共施設</option>
+					<option value="私有地/商業施設">私有地/商業施設</option>
+					<option value="道路">道路</option>
+					<option value="その他">その他</option>
+				</select></td>
+			</tr>
+
+			<tr hidden id="class2_category">
+				<td>分類：</td>
+				<td colspan="3"><select id="category2">
+					<option value="スーパー" selected>スーパー</option>
+					<option value="コンビニ">コンビニ</option>
+					<option value="飲食店">飲食店</option>
+					<option value="ネットカフェ・漫画喫茶">ネットカフェ・漫画喫茶</option>
+					<option value="カラオケ">カラオケ</option>
+					<option value="銭湯">銭湯</option>
+					<option value="ホテル">ホテル</option>
+					<option value="その他">その他</option>
+				</select></td>
+			</tr>
+			<tr hidden id="class2_name">
+				<td>店名：</td>
+				<td colspan="3"><input id="name" maxlength="100"></input></td>
+			</tr>
+			<tr hidden id="class2_fee">
+				<td>料金：</td>
+				<td colspan="3"><input id="fee" maxlength="100"></input></td>
+			</tr>
+
+			<tr>
+				<td>備考：</td>
+				<td colspan="3"><textarea id="memo" rows="3"></textarea></td>
+			</tr>
+			<tr>
+				<td colspan="4" style="text-align:center;"><button type="button" id="SubmitButton" onclick='PopUpSubmit()'> 上記の内容を登録 </button></td>
+			</tr>
+		</table>
+</form>
+<script>
+	/* 種別（野宿者、施設が変更された時の処理）*/
+	function ClassChange(){
+		if ($('#class').val() === "野宿者"){
+			$('#class2_category').hide();
+			$('#class2_name').hide();
+			$('#class2_fee').hide();
+			$('#class1').show();
+		}else{
+			$('#class2_category').show();
+			$('#class2_name').show();
+			$('#class2_fee').show();
+			$('#class1').hide();
+		}
+		return;
+	}
+
+	/* Classの内容を整えて本体の登録関数を呼び出す */
+	function PopUpSubmit(){
+		let commit = {};
+		if (confirm("この内容で登録しますか？")){
+			$('#SubmitButton').prop("disabled", true);
+			commit['area'] = $('#area').val();
+			commit['class'] = $('#class').val();
+			commit['memo'] = $('#memo').val();
+			if ($('#class').val() === "野宿者"){
+				commit['sex'] = $('#sex').val();
+				commit['category'] = $('#category1').val();
+				commit['name'] = "";
+				commit['fee'] = "";
+			}else{
+				commit['sex'] = "";
+				commit['category'] = $('#category2').val();
+				commit['name'] = $('#name').val();
+				commit['fee'] = $('#fee').val();
+			}
+			PostData(commit).then(function(){
+				$('#SubmitButton').prop("disabled", true)},
+			function(){
+				$('#SubmitButton').prop("disabled", true)},
+			);
+		}
+		return;
+	}
+</script>

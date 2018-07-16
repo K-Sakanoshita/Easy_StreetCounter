@@ -1,4 +1,38 @@
 <html>
-  <title>Easy StreetCounter</title>
+	<head>
+		<title>Easy StreetCounter</title>
+		<meta http-equiv="Pragma" content="no-cache">
+		<meta http-equiv="Cache-Control" content="no-cache">
+		<meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=2, minimum-scale=0.5" />
+		<meta charset="utf-8"/>
+		<meta name="author" content="K.Sakanoshita">
+		<meta property="og:url"           content="https://www.netfort.gr.jp/~saka/esc/" />
+		<meta property="og:type"          content="website" />
+		<meta property="og:title"         content="Easy StreetCounter" />
+		<meta property="og:description"   content="野宿者や施設の情報をカウントするツール" />
+		<meta property="og:image"         content="https://www.netfort.gr.jp/~saka/esc/esc.png" />
+	</head>
 
+	<body>
+		<link rel="shortcut icon" href="favicon.ico">
+		<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+		<link rel="stylesheet" href="index.css" />
+		<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+		<script src="https://www.promisejs.org/polyfills/promise-7.0.4.min.js"></script>
+		<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+		<script src="./Easy_StreetCounter.js"></script>
+
+		<div id="container">
+			<header>
+				<h1>Easy StreetCounter</h1>
+			</header>
+			<article id="article">
+				<div id="mapid"></div>
+			</article>
+			<footer>
+				<strong>注意：作った地図には [Map data © OpenStreetMap] を記載してください</strong> program by K.Sakanoshita
+			</footer>
+		</div>
+		<div hidden id="PopUp"></div>
+	</body>
 </html>
