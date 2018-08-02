@@ -9,6 +9,8 @@
 const GET_Url 	= "https://script.google.com/macros/s/AKfycby5AYueVHDlUph0Ag0doToykrKj2B_y3S04tGFylDPLezIWTKM/exec";
 const POST_Ok	= "登録に成功しました。";
 const POST_Ng   = "登録エラーです。もう一度やり直してください。";
+const ClassA	= "野宿者";
+const ClassB	= "施設";
 var map;
 var osm;					// OSM地図
 var ort;					// オルソ化航空写真
@@ -18,6 +20,8 @@ var L_Sel;
 var Layers;					// レイヤーの一覧(地理院地図、OSMなど)
 var contLayer = {};			// 
 var contents;
+var markers					// マーカー群
+var markerIcon = {};
 
 // initialize leaflet
 $(function(){
@@ -31,13 +35,30 @@ $(function(){
 		attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>"
     });
 	Layers = { 'OpenStreetMap': osm,'地理院（写真）': ort };
-	map = L.map('mapid', {zoomControl: false,layers: [osm]});
+	map = L.map('mapid', {zoomControl: true,layers: [osm]});
+	L.control.locate().addTo(map);
 	map.locate({setView: true});
 	map.on('moveend', function(){
 		map.off('moveend');
 		map.setZoom(18);
 	});
 	L.control.zoom({})
+
+	// アイコン設定
+	let LeafIcon = L.Icon.extend({
+		options: {
+			shadowUrl: './images/marker-icon-shadow.png',
+			iconSize:     [25, 41],
+			shadowSize:   [22, 25],
+			iconAnchor:   [13, 41],
+			shadowAnchor: [5, 25],
+			popupAnchor:  [0, -40]
+		}
+	});
+	markerIcon[ClassA]	= new LeafIcon({iconUrl: './images/marker-icon-blue.png'});
+	markerIcon[ClassB]	= new LeafIcon({iconUrl: './images/marker-icon-orange.png'});
+
+	GetData();
 
 	// クリックしたらポップアップを表示する
 	map.on('click', function(e) {
@@ -59,6 +80,26 @@ $(document).ready(function() {
 	$('#PopUp').load('PopUp.html');
 });
 
+// サーバーからデータを収集する
+function GetData(){
+	return new Promise(function(resolve,reject){
+		let date = new Date();
+		$.ajax({
+			type : "get",
+			url : GET_Url,
+			dataType: "jsonp",
+			jsonpCallback: 'GDocReturn'
+		})
+		.then(function(json){
+			MarkerSet(json);
+			resolve();
+		},function(json){
+			alert(POST_Ng);
+			reject(error);
+		});
+	});
+}
+
 // サーバーにデータを投稿する
 function PostData(commit){
 	return new Promise(function(resolve,reject){
@@ -75,11 +116,28 @@ function PostData(commit){
 		.then(function(json){
 			marker.closePopup();
 			alert (POST_Ok);
+			MarkerSet(json);
 			resolve();
 		},function(json){
 			alert(POST_Ng);
 			reject(error);
 		});
+	});
+}
+
+// マーカーを追加
+function MarkerSet (json){
+	if (markers != undefined){
+		markers.forEach(function(elements){
+			map.removeLayer(elements);
+		});
+	}
+	let i = 0;
+	markers = [];
+	json.forEach(function(elements){
+		markers[i] = L.marker([elements.lat,elements.lng],{icon: markerIcon[elements.class]}).addTo(map);
+		markers[i].bindPopup("種別:" + elements.class + " / 施設:" +elements.category + " / メモ:" + elements.memo);
+		i = i + 1;
 	});
 }
 
